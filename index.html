@@ -957,6 +957,29 @@
     /* ── SCROLL FADE ── */
     .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
     .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* Project sticky tabs */
+    .project-tabs-bar {
+      position: sticky; top: 64px; z-index: 90;
+      background: rgba(13,27,42,0.97); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: center;
+    }
+    .project-tab {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0.65rem 4rem; text-decoration: none;
+      color: rgba(255,255,255,0.45);
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .project-tab .tab-num {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
+      color: var(--teal); margin-bottom: 0.15rem;
+    }
+    .project-tab .tab-title { font-size: 0.78rem; font-weight: 600; }
+    .project-tab:hover,
+    .project-tab.active { color: var(--white); border-bottom-color: var(--teal); }
   </style>
 </head>
 <body>
@@ -1136,10 +1159,26 @@
     <p class="section-desc">커머스 재구축부터 UX 개선까지, 데이터 기반 기획의 결과입니다.</p>
   </div>
 
+  <!-- Project sticky tab nav -->
+  <div class="project-tabs-bar" id="project-tabs">
+    <a href="#project-01" class="project-tab">
+      <span class="tab-num">Project 01</span>
+      <span class="tab-title">커머스 플랫폼 재구축</span>
+    </a>
+    <a href="#project-02" class="project-tab">
+      <span class="tab-num">Project 02</span>
+      <span class="tab-title">어드민 고도화</span>
+    </a>
+    <a href="#project-03" class="project-tab">
+      <span class="tab-num">Project 03</span>
+      <span class="tab-title">메인 PC UX 개선</span>
+    </a>
+  </div>
+
   <div class="projects-container">
 
     <!-- PROJECT 01 -->
-    <div class="project-card fade-in">
+    <div class="project-card fade-in" id="project-01">
       <div class="project-header">
         <div class="project-num">Project 01</div>
         <h3 class="project-title">커머스 플랫폼 재구축</h3>
@@ -1909,7 +1948,7 @@
       <img id="lightbox-img" src="" alt="" />
       <div id="lightbox-caption"></div>
     </div>
-    <div class="project-card fade-in">
+    <div class="project-card fade-in" id="project-02">
       <div class="project-header" style="background: linear-gradient(135deg, #1a1040 0%, #2d1b69 100%);">
         <div class="project-num">Project 02</div>
         <h3 class="project-title">어드민 고도화<br/>— 프로모션 페이지 자동화</h3>
@@ -2150,7 +2189,7 @@
     </div>
 
     <!-- PROJECT 03 -->
-    <div class="project-card fade-in">
+    <div class="project-card fade-in" id="project-03">
       <div class="project-header" style="background: linear-gradient(135deg, #0c3547 0%, #0d5673 100%);">
         <div class="project-num">Project 03</div>
         <h3 class="project-title">메인 PC UX 개선</h3>
@@ -2201,19 +2240,19 @@
           <h4>문제 정의 (GA4 · Beusable 기반)</h4>
           <div class="detail-cards">
             <div class="detail-card" style="border-left: 3px solid #f59e0b;">
-              <h5>📉 주요 상품 미노출</h5>
+              <h5>문제1 · ❌ 주요 상품 미노출</h5>
               <p>Average Fold(991px) 이내 주요 상품 노출 없음. 약 53% 이상이 해당 영역 이전에 이탈.</p>
             </div>
             <div class="detail-card" style="border-left: 3px solid #f59e0b;">
-              <h5>📉 낮은 체류·전환 지표</h5>
+              <h5>문제2 · 📉 낮은 체류·전환 지표</h5>
               <p>UV 대비 PV·체류시간이 낮음. 상품 페이지 이탈이 83%에 가깝지만 후킹 요소 부족.</p>
             </div>
             <div class="detail-card" style="border-left: 3px solid #f59e0b;">
-              <h5>🔀 비효율적 UX 플로우</h5>
+              <h5>문제3 · 🔀 비효율적 UX 플로우</h5>
               <p>메인 아이템 배리에이션 구조가 타겟 유저와 불일치. 무효 클릭 빈번 발생.</p>
             </div>
             <div class="detail-card" style="border-left: 3px solid #f59e0b;">
-              <h5>⚙ 운영 비효율</h5>
+              <h5>문제4 · ⚙ 운영 비효율</h5>
               <p>대부분의 영역이 하드코딩되어 콘텐츠 즉각 반영 불가. 디자인·개발 의존도 높음.</p>
             </div>
           </div>
@@ -2568,6 +2607,36 @@
         ? 'var(--teal)' : 'rgba(255,255,255,0.75)';
     });
   });
+
+  // Project tab active state + offset scroll
+  const projectTabs = document.querySelectorAll('.project-tab');
+  const projectCards = document.querySelectorAll('.project-card[id]');
+
+  projectTabs.forEach(tab => {
+    tab.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(tab.getAttribute('href'));
+      if (!target) return;
+      const tabsBar = document.getElementById('project-tabs');
+      const offset = 64 + (tabsBar ? tabsBar.offsetHeight : 0);
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+
+  function updateProjectTabs() {
+    const tabsBar = document.getElementById('project-tabs');
+    const offset = 64 + (tabsBar ? tabsBar.offsetHeight : 0) + 8;
+    let current = '';
+    projectCards.forEach(card => {
+      if (window.scrollY >= card.offsetTop - offset) current = card.id;
+    });
+    projectTabs.forEach(tab => {
+      tab.classList.toggle('active', tab.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', updateProjectTabs, { passive: true });
+  updateProjectTabs();
 </script>
 </body>
 </html>
